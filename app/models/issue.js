@@ -2,14 +2,14 @@ var mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
 var IssueSchema = new Schema({
-  author: Object,
-  issueType: Object,
+  author: {type:Schema.Types.ObjectId, ref:'User'},
+  issueType: {type:Schema.Types.ObjectId, ref:'IssueType'},
   description: String,
   latitude: String,
   longitude: String,
   status: String,
-  staffmember: Object,
-  creatingDate: Date,
+  staffmember: {type:Schema.Types.ObjectId, ref:'User'},
+  creatingDate: {type: Date, default: Date.now},
   closingDate: Date
   
   
