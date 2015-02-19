@@ -15,12 +15,5 @@ var IssueSchema = new Schema({
   
 });
 
-
-
-UserSchema.virtual('date')
-  .get(function(){
-    return this._id.getTimestamp();
-  });
-
 mongoose.model('Issue', IssueSchema);
 

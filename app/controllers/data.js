@@ -126,8 +126,8 @@ function populateIssues(res) {
 			latitude: latitudes[randomInt(0, latitudes.length)],
 			longitude: longitudes[randomInt(0, longitudes.length)],
 			status: issueStates[randomInt(0, issueStates.length)],
-			sfafmember: users[randomInt(0, users.length)],
-			closingDate: ''
+			staffmember: users[randomInt(0, users.length)],
+			creatingDate: new Date()
 		});
 	}
 
