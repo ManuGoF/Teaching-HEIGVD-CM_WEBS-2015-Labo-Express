@@ -8,13 +8,6 @@ var IssueTypeSchema = new Schema({
   description: String
 });
 
-/*
-IssueTypeSchema.virtual('date')
-  .get(function(){
-    return this._id.getTimestamp();
-  });
-*/
-
 module.exports = mongoose.model('IssueType', IssueTypeSchema);
 
 
