@@ -5,7 +5,8 @@ var
   mongoose = require('mongoose'),
 	User = mongoose.model('User'),
 	IssueType = mongoose.model('IssueType'),
-	Issue = mongoose.model('Issue');
+	Issue = mongoose.model('Issue'),
+	Action = mongoose.model('Action');
 
 
 module.exports = function (app) {
@@ -113,6 +114,55 @@ function generateTags() {
 	return _.uniq(data);
 }
 
+function populateActions(res) {
+	// TODO: Implement the issue type generation
+
+	var data = [];
+	for (var i = 0; i < 10; i++) {
+		data.push({
+			// TODO: Implement the action random generation
+			type: 'addComment',
+			content: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
+			creatingDate: new Date()
+		});
+	}
+	
+	var data2 = [];
+	for (var i = 0; i < 20; i++) {
+		data2.push({
+			// TODO: Implement the action random generation
+			type: 'addTag',
+			content: tags[randomInt(0, tags.length)],
+			creatingDate: new Date()
+		});
+	}
+	
+	var data3 = [];
+	for (var i = 0; i < 5; i++) {
+		data2.push({
+			// TODO: Implement the action random generation
+			type: 'Réparation',
+			content: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
+			creatingDate: new Date()
+		});
+	}
+
+	Action.create(data, function(err) {
+		actions = Array.prototype.slice.call(arguments, 1);
+
+		Action.create(data2, function(err) {
+			actions = Array.prototype.slice.call(arguments, 1);
+					
+			Action.create(data3, function(err) {
+				actions = Array.prototype.slice.call(arguments, 1);
+						
+				res.status(200).end();
+				//res.end();
+			});
+		});
+	});
+}	
+
 function populateIssues(res) {
 	var creationDate = randomDate(new Date(2012, 0, 1), new Date(2015, 6, 1));
 
@@ -134,8 +184,7 @@ function populateIssues(res) {
 	// TODO: Replace the collection save by the correct call corresponding to your model
 	Issue.create(data, function(err) {
 		issues = Array.prototype.slice.call(arguments, 1);
-		//res.status(200).end();
-		res.end();
+		populateActions(res);
 	});
 }
 
@@ -145,7 +194,7 @@ function populateIssueTypes(res) {
 	var data = [];
 	for (var i = 0; i < 10; i++) {
 		data.push({
-			// TODO: Implement the issue random generation
+			// TODO: Implement the issuetype random generation
 			shortname: shortnames[randomInt(0, shortnames.length)],
 			description: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)]
 		});
@@ -194,10 +243,12 @@ function populateUsers(res) {
 
 router.route('/populate')
 	.post(function(req, res, next) {
-		Issue.find().remove(function(err) {
-			IssueType.find().remove(function(err) {
-				User.find().remove(function(err) {
-					populateUsers(res);
+		Action.find().remove(function(err) {
+			Issue.find().remove(function(err) {
+				IssueType.find().remove(function(err) {
+					User.find().remove(function(err) {
+						populateUsers(res);
+					});
 				});
 			});
 		});
