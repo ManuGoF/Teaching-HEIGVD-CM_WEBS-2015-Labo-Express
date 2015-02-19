@@ -4,7 +4,8 @@ var
   router = express.Router(),
   mongoose = require('mongoose'),
 	User = mongoose.model('User'),
-	IssueType = mongoose.model('IssueType');
+	IssueType = mongoose.model('IssueType'),
+	Issue = mongoose.model('Issue');
 
 
 module.exports = function (app) {
@@ -64,6 +65,28 @@ var shortnames = [
 	'dangerous population'
 ];
 
+var latitudes = [
+	'46.766129',
+	'46.784234',
+	'47.766129',
+	'47.784234',
+	'48.766129',
+	'48.784234',
+	'49.766129',
+	'49.784234'
+]
+
+var longitudes = [
+	'6.651878',
+	'6.622009',
+	'7.651878',
+	'7.622009',
+	'8.651878',
+	'8.622009',
+	'9.651878',
+	'9.622009'
+]
+
 var users = null;
 var citizen = null;
 var staff = null;
@@ -94,17 +117,26 @@ function populateIssues(res) {
 	var creationDate = randomDate(new Date(2012, 0, 1), new Date(2015, 6, 1));
 
 	var data = [];
-	for (var i = 0; i < 100; i++) {
+	for (var i = 0; i < 20; i++) {
 		data.push({
 			// TODO: Implement the issue random generation
+			author: users[randomInt(0, users.length)],
+			issueType: issueTypes[randomInt(0, issueTypes.length)],
+			description: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
+			latitude: latitudes[randomInt(0, latitudes.length)],
+			longitude: longitudes[randomInt(0, longitudes.length)],
+			status: issueStates[randomInt(0, issueStates.length)],
+			sfafmember: users[randomInt(0, users.length)],
+			closingDate: ''
 		});
 	}
 
 	// TODO: Replace the collection save by the correct call corresponding to your model
-	//Issue.create(data, function(err) {
-	//	issues = Array.prototype.slice.call(arguments, 1);
-	//	res.status(200).end();
-	//});
+	Issue.create(data, function(err) {
+		issues = Array.prototype.slice.call(arguments, 1);
+		//res.status(200).end();
+		res.end();
+	});
 }
 
 function populateIssueTypes(res) {
@@ -122,8 +154,7 @@ function populateIssueTypes(res) {
 	IssueType.create(data, function(err) {
 		issueTypes = Array.prototype.slice.call(arguments, 1);
 	
-		//populateIssues(res);
-		res.end();
+		populateIssues(res);
 	});
 }
 
@@ -163,9 +194,11 @@ function populateUsers(res) {
 
 router.route('/populate')
 	.post(function(req, res, next) {
-		IssueType.find().remove(function(err) {
-			User.find().remove(function(err) {
-				populateUsers(res);
+		Issue.find().remove(function(err) {
+			IssueType.find().remove(function(err) {
+				User.find().remove(function(err) {
+					populateUsers(res);
+				});
 			});
 		});
 	})
