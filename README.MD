@@ -1,3 +1,7 @@
+Projet dans le cadre du cours Webservices par Emmanuel Bezençon et Cedric Liengme
+
+URL Heroku : http://safe-shore-2320.herokuapp.com/
+
 # Smart City - Citizen Engagement - Express Skeleton
 
 ## Introduction
