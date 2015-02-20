@@ -95,6 +95,7 @@ var staff = null;
 var issueTypes = null;
 var issues = null;
 var comments = null;
+var actions = null;
 
 // Yverdon square perimeter (Chamard -> Y-Parc approx)
 var minLat = 46.766129;
@@ -131,8 +132,9 @@ function populateIssues(res) {
 			status: issueStates[randomInt(0, issueStates.length)],
 			staffmember: users[randomInt(0, users.length)],
 			creatingDate: new Date(),
+			actions: actions[randomInt(0, comments.length)],
 			comments: comments[randomInt(0, comments.length)],
-			tags: [tags[randomInt(0, tags.length)]]
+			tags: tags[randomInt(0, tags.length)]
 		});
 	}
 
@@ -142,6 +144,56 @@ function populateIssues(res) {
 		res.status(200).end();
 	});
 }
+
+function populateActions(res) {
+	// TODO: Implement the issue type generation
+
+	var data = [];
+	for (var i = 0; i < 10; i++) {
+		data.push({
+			// TODO: Implement the action random generation
+			type: 'addComment',
+			content: comments[randomInt(0, comments.length)],
+			creatingDate: new Date()
+		});
+	}
+	
+	var data2 = [];
+	for (var i = 0; i < 20; i++) {
+		data2.push({
+			// TODO: Implement the action random generation
+			type: 'addTag',
+			content: tags[randomInt(0, tags.length)],
+			creatingDate: new Date()
+		});
+	}
+	/*
+	var data3 = [];
+	for (var i = 0; i < 5; i++) {
+		data3.push({
+			// TODO: Implement the action random generation
+			type: 'Réparation',
+			content: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
+			creatingDate: new Date()
+		});
+	}*/
+
+	Action.create(data, function(err) {
+		actions = Array.prototype.slice.call(arguments, 1);
+
+		Action.create(data2, function(err) {
+			actions = Array.prototype.slice.call(arguments, 1);
+					
+			//Action.create(data3, function(err) {
+			//	actions = Array.prototype.slice.call(arguments, 1);
+						
+				//res.status(200).end();
+				//res.end();
+				populateIssues(res);
+			//});
+		});
+	});
+}	
 
 function populateComments(res) {
 	// TODO: Implement the comment type generation
@@ -160,59 +212,9 @@ function populateComments(res) {
 		comments = Array.prototype.slice.call(arguments, 1);
 	
 		//res.status(200).end();
-		populateIssues(res);
+		populateActions(res);
 	});
 }
-
-function populateActions(res) {
-	// TODO: Implement the issue type generation
-
-	var data = [];
-	for (var i = 0; i < 10; i++) {
-		data.push({
-			// TODO: Implement the action random generation
-			type: 'addComment',
-			content: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
-			creatingDate: new Date()
-		});
-	}
-	
-	var data2 = [];
-	for (var i = 0; i < 20; i++) {
-		data2.push({
-			// TODO: Implement the action random generation
-			type: 'addTag',
-			content: tags[randomInt(0, tags.length)],
-			creatingDate: new Date()
-		});
-	}
-	
-	var data3 = [];
-	for (var i = 0; i < 5; i++) {
-		data2.push({
-			// TODO: Implement the action random generation
-			type: 'Réparation',
-			content: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
-			creatingDate: new Date()
-		});
-	}
-
-	Action.create(data, function(err) {
-		actions = Array.prototype.slice.call(arguments, 1);
-
-		Action.create(data2, function(err) {
-			actions = Array.prototype.slice.call(arguments, 1);
-					
-			Action.create(data3, function(err) {
-				actions = Array.prototype.slice.call(arguments, 1);
-						
-				//res.status(200).end();
-				//res.end();
-				populateComments(res);
-			});
-		});
-	});
-}	
 
 function populateIssueTypes(res) {
 	// TODO: Implement the issue type generation
@@ -229,7 +231,7 @@ function populateIssueTypes(res) {
 	IssueType.create(data, function(err) {
 		issueTypes = Array.prototype.slice.call(arguments, 1);
 	
-		populateActions(res);
+		populateComments(res);
 	});
 }
 
@@ -270,8 +272,8 @@ function populateUsers(res) {
 router.route('/populate')
 	.post(function(req, res, next) {
 		Issue.find().remove(function(err) {
-			Action.find().remove(function(err) {
-				Comment.find().remove(function(err) {
+			Comment.find().remove(function(err) {
+				Action.find().remove(function(err) {
 					IssueType.find().remove(function(err) {
 						User.find().remove(function(err) {
 							populateUsers(res);
