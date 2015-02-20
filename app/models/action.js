@@ -3,7 +3,7 @@ var mongoose = require('mongoose'),
 
 var ActionSchema = new Schema({
   type: String,
-  content: String,
+  content: {},
   creatingDate: {type: Date, default: Date.now}, 
 });
 

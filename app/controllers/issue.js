@@ -4,6 +4,8 @@ var
         router = express.Router(),
         mongoose = require('mongoose'),
         Issue = mongoose.model('Issue');
+        Action = mongoose.model('Action');
+        Comment = mongoose.model('Comment');
 
 module.exports = function(app) {
     app.use('/api/issues', router);
@@ -95,6 +97,22 @@ router.route('/:id')
         });
 
 router.route('/:id/actions')
-       
-       
-       
+
+        .post(function(req, res, next) {
+            var action = new Action({
+                type: req.body.type,
+                content: req.body.content
+            });
+            
+            if (action.type === "addComment") {
+                var comment = new Comment(
+                        content
+                        )
+                console.log(action.content['comment']);
+            }
+            
+            
+
+
+        })
+       ;
