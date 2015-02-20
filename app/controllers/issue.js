@@ -34,6 +34,16 @@ function convertMongoComment(comment) {
     };
 }
 
+function convertMongoAction(action) {
+    //return user.toObject({ transform: true })
+    return {
+        id: action.id,
+        type: action.type,
+        content: action.content,
+        creatingDate: action.creatingDate
+    };
+}
+
 router.route('/')
         .get(function(req, res, next) {
             Issue.find().populate('issueType author staffmember').exec(function(err, issues) {
@@ -103,6 +113,22 @@ router.route('/:id')
         });
 
 router.route('/:id/actions')
+
+
+        .get(function(req, res, next) {
+            Issue.findById(req.params.id)
+                .populate('actions')
+                .exec(function(err,issue) {
+                if (issue === null) {
+                    res.status(204).end();
+                }
+                else {
+                    res.json(_.map(issue.actions, function(action) {
+                        return convertMongoAction(action);
+                    }))
+                }
+            })
+        })
 
 
         .post(function(req, res, next) {

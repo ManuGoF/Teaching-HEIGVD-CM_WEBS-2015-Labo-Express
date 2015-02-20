@@ -6,7 +6,8 @@ var
 	User = mongoose.model('User'),
 	IssueType = mongoose.model('IssueType'),
 	Issue = mongoose.model('Issue'),
-	Action = mongoose.model('Action');
+	Action = mongoose.model('Action'),
+	Comment = mongoose.model('Comment');
 
 
 module.exports = function (app) {
@@ -93,6 +94,7 @@ var citizen = null;
 var staff = null;
 var issueTypes = null;
 var issues = null;
+var comments = null;
 
 // Yverdon square perimeter (Chamard -> Y-Parc approx)
 var minLat = 46.766129;
@@ -112,6 +114,54 @@ function generateTags() {
 	}
 
 	return _.uniq(data);
+}
+
+function populateIssues(res) {
+	var creationDate = randomDate(new Date(2012, 0, 1), new Date(2015, 6, 1));
+
+	var data = [];
+	for (var i = 0; i < 20; i++) {
+		data.push({
+			// TODO: Implement the issue random generation
+			author: users[randomInt(0, users.length)],
+			issueType: issueTypes[randomInt(0, issueTypes.length)],
+			description: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
+			latitude: latitudes[randomInt(0, latitudes.length)],
+			longitude: longitudes[randomInt(0, longitudes.length)],
+			status: issueStates[randomInt(0, issueStates.length)],
+			staffmember: users[randomInt(0, users.length)],
+			creatingDate: new Date(),
+			comments: comments[randomInt(0, comments.length)],
+			tags: [tags[randomInt(0, tags.length)]]
+		});
+	}
+
+	// TODO: Replace the collection save by the correct call corresponding to your model
+	Issue.create(data, function(err) {
+		issues = Array.prototype.slice.call(arguments, 1);
+		res.status(200).end();
+	});
+}
+
+function populateComments(res) {
+	// TODO: Implement the comment type generation
+
+	var data = [];
+	for (var i = 0; i < 10; i++) {
+		data.push({
+			// TODO: Implement the issuetype random generation
+			content: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
+			author: users[randomInt(0, users.length)],
+			creatingDate: new Date()
+		});
+	}
+	
+	Comment.create(data, function(err) {
+		comments = Array.prototype.slice.call(arguments, 1);
+	
+		//res.status(200).end();
+		populateIssues(res);
+	});
 }
 
 function populateActions(res) {
@@ -156,37 +206,13 @@ function populateActions(res) {
 			Action.create(data3, function(err) {
 				actions = Array.prototype.slice.call(arguments, 1);
 						
-				res.status(200).end();
+				//res.status(200).end();
 				//res.end();
+				populateComments(res);
 			});
 		});
 	});
 }	
-
-function populateIssues(res) {
-	var creationDate = randomDate(new Date(2012, 0, 1), new Date(2015, 6, 1));
-
-	var data = [];
-	for (var i = 0; i < 20; i++) {
-		data.push({
-			// TODO: Implement the issue random generation
-			author: users[randomInt(0, users.length)],
-			issueType: issueTypes[randomInt(0, issueTypes.length)],
-			description: descriptionsAndComments[randomInt(0, descriptionsAndComments.length)],
-			latitude: latitudes[randomInt(0, latitudes.length)],
-			longitude: longitudes[randomInt(0, longitudes.length)],
-			status: issueStates[randomInt(0, issueStates.length)],
-			staffmember: users[randomInt(0, users.length)],
-			creatingDate: new Date()
-		});
-	}
-
-	// TODO: Replace the collection save by the correct call corresponding to your model
-	Issue.create(data, function(err) {
-		issues = Array.prototype.slice.call(arguments, 1);
-		populateActions(res);
-	});
-}
 
 function populateIssueTypes(res) {
 	// TODO: Implement the issue type generation
@@ -203,7 +229,7 @@ function populateIssueTypes(res) {
 	IssueType.create(data, function(err) {
 		issueTypes = Array.prototype.slice.call(arguments, 1);
 	
-		populateIssues(res);
+		populateActions(res);
 	});
 }
 
@@ -243,11 +269,13 @@ function populateUsers(res) {
 
 router.route('/populate')
 	.post(function(req, res, next) {
-		Action.find().remove(function(err) {
-			Issue.find().remove(function(err) {
-				IssueType.find().remove(function(err) {
-					User.find().remove(function(err) {
-						populateUsers(res);
+		Issue.find().remove(function(err) {
+			Action.find().remove(function(err) {
+				Comment.find().remove(function(err) {
+					IssueType.find().remove(function(err) {
+						User.find().remove(function(err) {
+							populateUsers(res);
+						});
 					});
 				});
 			});
