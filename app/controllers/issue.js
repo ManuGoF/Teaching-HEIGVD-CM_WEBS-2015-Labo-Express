@@ -148,7 +148,10 @@ router.route('/:id/actions')
                         issue['actions'].push(action);
                         console.log(issue);
                         issue.save(function(err, issueSaved) {
-                            res.json(convertMongoIssue(issueSaved));
+                            action.save(function(err, actionSaved) {
+                                res.json(convertMongoIssue(issueSaved));
+                            });
+                            
                         });
                     });
 
