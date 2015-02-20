@@ -116,14 +116,16 @@ router.route('/:id/actions')
 
 
         .get(function(req, res, next) {
-            Issue.findById(req.params.id)
-                .populate('actions')
-                .exec(function(err,issue) {
+            Issue.findById(req.params.id).populate('actions').exec(function(err,issue) {
                 if (issue === null) {
                     res.status(204).end();
                 }
                 else {
+                    console.log(issue);
+                    console.log(issue.actions);
+
                     res.json(_.map(issue.actions, function(action) {
+                        console.log(convertMongoAction(action));
                         return convertMongoAction(action);
                     }))
                 }
