@@ -4,9 +4,7 @@ var mongoose = require('mongoose'),
 var ActionSchema = new Schema({
   type: String,
   content: String,
-  creatingDate: Date
-  
-  
+  creatingDate: {type: Date, default: Date.now}, 
 });
 
 mongoose.model('Action', ActionSchema);
