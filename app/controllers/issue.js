@@ -70,8 +70,6 @@ router.route('/:id')
                 else {
                     res.json(convertMongoIssue(issue));
                 }
-
-
             });
         })
 
@@ -105,6 +103,18 @@ router.route('/:id')
         });
 
 router.route('/:id/actions')
+        .get(function(req, res, next) {
+            Issue.findById(req.params.id).exec(function(err, issue) {
+                if (issue === null) {
+                    res.status(204).end();
+                }
+                else {
+                    res.json(_.map(actions, function(action) {
+                        return issue;
+                    }
+                }
+            });
+        })
 
         .post(function(req, res, next) {
             var action = new Action({
