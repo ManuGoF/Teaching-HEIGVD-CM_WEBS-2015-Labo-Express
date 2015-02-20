@@ -10,8 +10,10 @@ var IssueSchema = new Schema({
   status: String,
   staffmember: {type:Schema.Types.ObjectId, ref:'User'},
   creatingDate: {type: Date, default: Date.now},
-  closingDate: Date
-  
+  closingDate: Date,
+  actions: [{type:Schema.Types.ObjectId, ref:'Action'}],
+  comments: [{type:Schema.Types.ObjectId, ref:'Comment'}],
+  tags: [String]
   
 });
 
