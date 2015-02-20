@@ -95,45 +95,6 @@ router.route('/:id')
         });
 
 router.route('/:id/actions')
-        .get(function(req, res, next) {
-            Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
-                if (issue === null) {
-                    res.status(204).end();
-                }
-                else {
-                    res.json(convertMongoAction(issue.));
-                }
-
-
-            });
-        })
-
-        .put(function(req, res, next) {
-            Issue.findById(req.params.id, function(err, issue) {
-                if (issue === null) {
-                    res.status(204).end();
-                }
-                else {
-                    issue.author = req.body.author;
-                    issue.issueType = req.body.issueType;
-                    issue.description = req.body.description;
-                    issue.latitude = req.body.latitude;
-                    issue.longitude = req.body.longitude;
-                    issue.status = req.body.status;
-                    issue.staffmember = req.body.staffmember;
-
-                    issue.save(function(err, issueSaved) {
-                        res.json(convertMongoIssue(issueSaved));
-                    });
-                }
-
-
-            });
-        })
-
-        .delete(function(req, res, next) {
-            Issue.findByIdAndRemove(req.params.id, function(err) {
-                res.status(204).end();
-            });
-        });
-
+       
+       
+       
