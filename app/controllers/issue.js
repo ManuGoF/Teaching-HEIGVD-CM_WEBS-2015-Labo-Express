@@ -4,8 +4,8 @@ var
         router = express.Router(),
         mongoose = require('mongoose'),
         Issue = mongoose.model('Issue');
-        Action = mongoose.model('Action');
-        Comment = mongoose.model('Comment');
+Action = mongoose.model('Action');
+Comment = mongoose.model('Comment');
 
 module.exports = function(app) {
     app.use('/api/issues', router);
@@ -23,6 +23,14 @@ function convertMongoIssue(issue) {
         staffmember: issue.staffmember,
         creatingDate: issue.creatingDate,
         closingDate: issue.closingDate
+    };
+}
+
+    function convertMongoComment(comment) {
+    return {
+        id: comment.id,
+        author: comment.author,
+        content: comment.content
     };
 }
 
@@ -103,16 +111,25 @@ router.route('/:id/actions')
                 type: req.body.type,
                 content: req.body.content
             });
-            
+
             if (action.type === "addComment") {
-                var comment = new Comment(
-                        content
-                        )
-                console.log(action.content['comment']);
+                var comment = new Comment({
+                    author: action.content['author'],
+                    content: action.content['comment']
+                });
+                comment.save(function(err, commentSaved) {
+                    res.json(convertMongoComment(commentSaved));
+                    Issue.findById(req.params.id).exec(function(err, issue){
+                        console.log(issue['actions']);
+                        
+                    });
+                    
+                });
+
+
             }
-            
-            
 
 
-        })
-       ;
+
+
+        });
