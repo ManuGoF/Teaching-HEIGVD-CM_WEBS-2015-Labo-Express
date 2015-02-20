@@ -27,7 +27,6 @@ function convertMongoIssue(issue) {
 router.route('/')
         .get(function(req, res, next) {
             Issue.find().populate('issueType author staffmember').exec(function(err, issues) {
-
                 if (err)
                     return next(err);
                 res.json(_.map(issues, function(issue) {
@@ -45,7 +44,6 @@ router.route('/')
                 longitude: req.body.longitude,
                 status: req.body.status,
                 staffmember: req.body.staffmember,
-                
             });
 
             issue.save(function(err, issueSaved) {
@@ -53,6 +51,33 @@ router.route('/')
             });
         });
 
+router.route('/:id')
 
-;
+        .get(function(req, res, next) {
+            Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
+                res.json(convertMongoIssue(issue));
+            });
+        })
+
+        .put(function(req, res, next) {
+            Issue.findById(req.params.id, function(err, issue) {
+                issue.author = req.body.author;
+                issue.issueType = req.body.issueType;
+                issue.description = req.body.description;
+                issue.latitude = req.body.latitude;
+                issue.longitude = req.body.longitude;
+                issue.status = req.body.status;
+                issue.staffmember = req.body.staffmember;
+
+                issue.save(function(err, issueSaved) {
+                    res.json(convertMongoIssue(issueSaved));
+                });
+            });
+        })
+
+        .delete(function(req, res, next) {
+            Issue.findByIdAndRemove(req.params.id, function(err) {
+                res.status(204).end();
+            });
+        });
 
