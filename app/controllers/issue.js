@@ -21,7 +21,7 @@ function convertMongoIssue(issue) {
         staffmember: issue.staffmember,
         creatingDate: issue.creatingDate,
         closingDate: issue.closingDate
-    }
+    };
 }
 
 router.route('/')
@@ -43,7 +43,7 @@ router.route('/')
                 latitude: req.body.latitude,
                 longitude: req.body.longitude,
                 status: req.body.status,
-                staffmember: req.body.staffmember,
+                staffmember: req.body.staffmember
             });
 
             issue.save(function(err, issueSaved) {
@@ -55,23 +55,37 @@ router.route('/:id')
 
         .get(function(req, res, next) {
             Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
-                res.json(convertMongoIssue(issue));
+                if (issue === null) {
+                    res.status(204).end();
+                }
+                else {
+                    res.json(convertMongoIssue(issue));
+                }
+
+
             });
         })
 
         .put(function(req, res, next) {
             Issue.findById(req.params.id, function(err, issue) {
-                issue.author = req.body.author;
-                issue.issueType = req.body.issueType;
-                issue.description = req.body.description;
-                issue.latitude = req.body.latitude;
-                issue.longitude = req.body.longitude;
-                issue.status = req.body.status;
-                issue.staffmember = req.body.staffmember;
+                if (issue === null) {
+                    res.status(204).end();
+                }
+                else {
+                    issue.author = req.body.author;
+                    issue.issueType = req.body.issueType;
+                    issue.description = req.body.description;
+                    issue.latitude = req.body.latitude;
+                    issue.longitude = req.body.longitude;
+                    issue.status = req.body.status;
+                    issue.staffmember = req.body.staffmember;
 
-                issue.save(function(err, issueSaved) {
-                    res.json(convertMongoIssue(issueSaved));
-                });
+                    issue.save(function(err, issueSaved) {
+                        res.json(convertMongoIssue(issueSaved));
+                    });
+                }
+
+
             });
         })
 
