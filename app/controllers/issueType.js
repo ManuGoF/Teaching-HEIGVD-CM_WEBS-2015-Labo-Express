@@ -1,6 +1,6 @@
-var 
+var
 _ = require('underscore'),
-express = require('express'),
+  express = require('express'),
   router = express.Router(),
   mongoose = require('mongoose'),
   IssueType = mongoose.model('IssueType');
@@ -24,12 +24,16 @@ router.route('/')
     
     // get all the issuetypes (accessed at GET http://localhost:3000/api/issuetypes)
 	.get(function(req, res, next) {
+            var by = req.query.by;
             var order = req.query.order;
             if (order !== 'asc' && order !== 'desc') {
                 order = 'asc';
             } 
+            if (by !== 'id' && by !== 'shortname' && by !== 'description') {
+                by = 'shortname';
+            }
 
-		IssueType.find().sort([['shortname', order]]).exec(function (err, issueTypes) {
+		IssueType.find().sort([[by, order]]).exec(function (err, issueTypes) {
 		  if (err) return next(err);
 		  res.json(_.map(issueTypes, function(issueType) {
 				return convertMongoIssueType(issueType);
