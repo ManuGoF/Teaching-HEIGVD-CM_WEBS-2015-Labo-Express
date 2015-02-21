@@ -145,7 +145,7 @@ router.route('/:id/actions')
                     content: action.content['comment']
                 });
                 comment.save(function(err, commentSaved) {
-                    Issue.findById(req.params.id).exec(function(err, issue) {
+                    Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
                         issue['comments'].push(commentSaved);
                         issue['actions'].push(action);
                         console.log(issue);
@@ -161,9 +161,17 @@ router.route('/:id/actions')
 
 
             } else if (action.type === 'addTag') {
-                Issue.findById(req.params.id).exec(function(err, issue) {
+                Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
                     issue['tags'].push(action.content['tag']);
-                    console.log(issue);
+                    issue.save(function(err, issueSaved) {
+                        action.save(function(err, actionSaved) {
+                            res.json(convertMongoIssue(issueSaved));
+                        });
+                    });
+                });
+            } else if (action.type === 'updateStatus') {
+                Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
+                    issue.status = action.content['newStatus'];
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
