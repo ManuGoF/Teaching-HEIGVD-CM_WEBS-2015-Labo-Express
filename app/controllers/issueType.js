@@ -14,7 +14,7 @@ function convertMongoIssueType(issueType) {
 	//return user.toObject({ transform: true })
 	return {
 		id: issueType.id,
-		firstname: issueType.shortname,
+		shortname: issueType.shortname,
 		description: issueType.description
 	};
 }
@@ -24,7 +24,12 @@ router.route('/')
     
     // get all the issuetypes (accessed at GET http://localhost:3000/api/issuetypes)
 	.get(function(req, res, next) {
-		IssueType.find(function (err, issueTypes) {
+            var order = req.query.order;
+            if (order !== 'asc' && order !== 'desc') {
+                order = 'asc';
+            } 
+
+		IssueType.find().sort([['shortname', order]]).exec(function (err, issueTypes) {
 		  if (err) return next(err);
 		  res.json(_.map(issueTypes, function(issueType) {
 				return convertMongoIssueType(issueType);
