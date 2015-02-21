@@ -26,7 +26,7 @@ router.route('/')
         .get(function(req, res, next) {
             var by = req.query.by;
             var order = req.query.order;
-            var regex = new RegExp(req.params.search, 'i');
+            var regex = new RegExp(req.query.search, 'i');
             if (order !== 'asc' && order !== 'desc') {
                 order = 'asc';
             }
