@@ -14,13 +14,13 @@ module.exports = function(app) {
 function convertMongoIssue(issue) {
     return {
         id: issue.id,
-        author: issue.author,
-        issueType: issue.issueType,
+        author: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
+        issueType: {"id": issue.issueType['id'], "shortname": issue.issueType['shortname'], "description": issue.issueType['description']},
         description: issue.description,
         latitude: issue.latitude,
         longitude: issue.longitude,
         status: issue.status,
-        staffmember: issue.staffmember,
+        staffmember: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
         creatingDate: issue.creatingDate,
         closingDate: issue.closingDate
     };
@@ -116,7 +116,7 @@ router.route('/:id/actions')
 
 
         .get(function(req, res, next) {
-            Issue.findById(req.params.id).populate('actions').exec(function(err,issue) {
+            Issue.findById(req.params.id).populate('actions').exec(function(err, issue) {
                 if (issue === null) {
                     res.status(204).end();
                 }
@@ -127,9 +127,9 @@ router.route('/:id/actions')
                     res.json(_.map(issue.actions, function(action) {
                         console.log(convertMongoAction(action));
                         return convertMongoAction(action);
-                    }))
+                    }));
                 }
-            })
+            });
         })
 
 
@@ -153,7 +153,7 @@ router.route('/:id/actions')
                             action.save(function(err, actionSaved) {
                                 res.json(convertMongoIssue(issueSaved));
                             });
-                            
+
                         });
                     });
 
@@ -166,8 +166,8 @@ router.route('/:id/actions')
                     console.log(issue);
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
-                                res.json(convertMongoIssue(issueSaved));
-                            });
+                            res.json(convertMongoIssue(issueSaved));
+                        });
                     });
                 });
             }
