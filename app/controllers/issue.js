@@ -8,7 +8,7 @@ var
         Comment = mongoose.model('Comment');
 
 module.exports = function(app) {
-    app.use('/api/issues', router);
+    app.use('/api/v1/issues', router);
 };
 
 function convertMongoIssue(issue) {
@@ -67,7 +67,10 @@ router.route('/')
             });
 
             issue.save(function(err, issueSaved) {
-                res.status(201).json(convertMongoIssue(issueSaved));
+                Issue.findById(issueSaved.id).populate('issueType author staffmember').exec(function(err, issuePopulated) {
+                    res.status(201).json(convertMongoIssue(issuePopulated));
+                });
+
             });
         });
 
@@ -84,7 +87,7 @@ router.route('/:id')
         })
 
         .put(function(req, res, next) {
-            Issue.findById(req.params.id, function(err, issue) {
+            Issue.findById(req.params.id).exec(function(err, issue) {
                 if (issue === null) {
                     res.status(204).end();
                 }
@@ -98,7 +101,9 @@ router.route('/:id')
                     issue.staffmember = req.body.staffmember;
 
                     issue.save(function(err, issueSaved) {
-                        res.json(convertMongoIssue(issueSaved));
+                        Issue.findById(issueSaved.id).populate('issueType author staffmember').exec(function(err, issuePopulated) {
+                            res.status(201).json(convertMongoIssue(issuePopulated));
+                        });
                     });
                 }
 

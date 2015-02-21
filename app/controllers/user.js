@@ -6,7 +6,7 @@ var
         User = mongoose.model('User');
 
 module.exports = function(app) {
-    app.use('/api/users', router);
+    app.use('/api/v1/users', router);
 };
 
 function convertMongoUser(user) {

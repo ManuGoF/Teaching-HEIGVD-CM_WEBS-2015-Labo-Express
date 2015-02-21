@@ -11,7 +11,7 @@ var
 
 
 module.exports = function (app) {
-  app.use('/api/data', router);
+  app.use('/api/v1/data', router);
 };
 
 function random (low, high) {

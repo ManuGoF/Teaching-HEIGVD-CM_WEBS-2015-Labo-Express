@@ -6,7 +6,7 @@ express = require('express'),
   IssueType = mongoose.model('IssueType');
 
 module.exports = function (app) {
-  app.use('/api/issuetypes', router);
+  app.use('/api/v1/issuetypes', router);
 };
 
 

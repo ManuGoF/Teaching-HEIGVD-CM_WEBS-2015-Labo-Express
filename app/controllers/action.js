@@ -6,7 +6,7 @@ express = require('express'),
   Action = mongoose.model('Action');
 
 module.exports = function (app) {
-  app.use('/api/actions', router);
+  app.use('/api/v1/actions', router);
 };
 
 
