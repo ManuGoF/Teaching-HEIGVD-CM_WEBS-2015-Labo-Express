@@ -85,8 +85,8 @@ router.route('/')
 router.route('/:id')
         .get(function(req, res, next) {
             Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
-                if (issue === null) {
-                    res.status(204).end();
+                if (issue === undefined) {
+                    res.status(404).json({error:{message:'resource not found'}}).end();
                 }
                 else {
                     res.json(convertMongoIssue(issue));
@@ -96,8 +96,8 @@ router.route('/:id')
 
         .put(function(req, res, next) {
             Issue.findById(req.params.id).exec(function(err, issue) {
-                if (issue === null) {
-                    res.status(204).end();
+                if (issue === undefined) {
+                    res.status(404).json({error:{message:'resource not found'}}).end();
                 }
                 else {
                     issue.author = req.body.author;
@@ -121,7 +121,7 @@ router.route('/:id')
 
         .delete(function(req, res, next) {
             Issue.findByIdAndRemove(req.params.id, function(err) {
-                res.status(204).end();
+                res.status(404).end();
             });
         });
 
@@ -130,15 +130,12 @@ router.route('/:id/actions')
 
         .get(function(req, res, next) {
             Issue.findById(req.params.id).populate('actions').exec(function(err, issue) {
-                if (issue === null) {
-                    res.status(204).end();
+                if (issue === undefined) {
+                    res.status(404).json({error:{message:'resource not found'}}).end();
                 }
                 else {
-                    console.log(issue);
-                    console.log(issue.actions);
 
                     res.json(_.map(issue.actions, function(action) {
-                        console.log(convertMongoAction(action));
                         return convertMongoAction(action);
                     }));
                 }
@@ -161,7 +158,6 @@ router.route('/:id/actions')
                     Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
                         issue['comments'].push(commentSaved);
                         issue['actions'].push(action);
-                        console.log(issue);
                         issue.save(function(err, issueSaved) {
                             action.save(function(err, actionSaved) {
                                 res.json(convertMongoIssue(issueSaved));
