@@ -46,7 +46,15 @@ function convertMongoAction(action) {
 
 router.route('/')
         .get(function(req, res, next) {
-            Issue.find().populate('issueType author staffmember').exec(function(err, issues) {
+            var paginate = req.query.ps;
+            var pageNumber = req.query.p;
+            //var user = new RegExp(req.query.user, 'i');
+            Issue.find()
+                    //.or([{'author': user}])
+                    //.sort([[by, order]])
+                    .skip((pageNumber-1)*paginate).limit(paginate)
+                    .populate('issueType author staffmember')
+                    .exec(function(err, issues) {
                 if (err)
                     return next(err);
                 res.json(_.map(issues, function(issue) {
