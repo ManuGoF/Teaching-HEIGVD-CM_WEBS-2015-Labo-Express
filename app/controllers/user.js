@@ -7,6 +7,9 @@ var
 
 module.exports = function(app) {
     app.use('/api/v1/users', router);
+    app.use('*', function(req, res) {
+        res.status(404).json({error: {message: 'route not found'}});
+    });
 };
 
 function convertMongoUser(user) {

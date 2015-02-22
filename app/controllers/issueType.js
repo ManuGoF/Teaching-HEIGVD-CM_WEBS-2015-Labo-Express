@@ -37,7 +37,7 @@ router.route('/')
             IssueType.find()
                     .or([{'shortname': regex}, {'description': regex}, {'id': regex}])
                     .sort([[by, order]])
-                    .skip().limit(5)
+                    //.skip().limit() -> to implement for pagination
                     .exec(function(err, issueTypes) {
                         if (err)
                             return next(err);
