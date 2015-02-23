@@ -48,19 +48,53 @@ router.route('/')
         .get(function(req, res, next) {
             var paginate = req.query.ps;
             var pageNumber = req.query.p;
-            //var user = new RegExp(req.query.user, 'i');
+            var author = req.query.author;
+            var issueType = req.query.issueType;
+            var issueType = req.query.issueType;
+            var from = req.query.fromDate;
+            var to = req.query.toDate;
+            var solved = req.query.solved;
+            var query = {};
+            if (author !== undefined) {
+                query['author'] = author;
+            }
+            if (issueType !== undefined) {
+                query['issueType'] = issueType;
+            }
+            if (from !== undefined) {
+                query['creatingDate'] = {$gt: new Date(from)};
+            }
+            if (to !== undefined) {
+                var toDate = new Date(to);
+                toDate.setDate(toDate.getDate() + 1);
+                query['creatingDate'] = {$lt: toDate};
+            }
+            if (from !== undefined && to !== undefined) {
+                var toDate = new Date(to);
+                toDate.setDate(toDate.getDate() + 1);
+                query['creatingDate'] = {$lt: toDate, $gt: new Date(from)};
+            }
+            if (solved !== undefined) {
+                if (solved === 'true') {
+                    query['$where'] = 'this.status == "solved"';
+                } else if (solved === 'false') {
+                    query['$where'] = 'this.status != "solved"';
+                }
+                
+            }
+            
             Issue.find()
-                    //.or([{'author': user}])
+                    .and(query)
                     //.sort([[by, order]])
-                    .skip((pageNumber-1)*paginate).limit(paginate)
+                    .skip((pageNumber - 1) * paginate).limit(paginate)
                     .populate('issueType author staffmember')
                     .exec(function(err, issues) {
-                if (err)
-                    return next(err);
-                res.json(_.map(issues, function(issue) {
-                    return convertMongoIssue(issue);
-                }));
-            });
+                        if (err)
+                            return next(err);
+                        res.json(_.map(issues, function(issue) {
+                            return convertMongoIssue(issue);
+                        }));
+                    });
         })
 
         .post(function(req, res, next) {
@@ -86,7 +120,7 @@ router.route('/:id')
         .get(function(req, res, next) {
             Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
                 if (issue === undefined) {
-                    res.status(404).json({error:{message:'resource not found'}}).end();
+                    res.status(404).json({error: {message: 'resource not found'}}).end();
                 }
                 else {
                     res.json(convertMongoIssue(issue));
@@ -97,7 +131,7 @@ router.route('/:id')
         .put(function(req, res, next) {
             Issue.findById(req.params.id).exec(function(err, issue) {
                 if (issue === undefined) {
-                    res.status(404).json({error:{message:'resource not found'}}).end();
+                    res.status(404).json({error: {message: 'resource not found'}}).end();
                 }
                 else {
                     issue.author = req.body.author;
@@ -131,7 +165,7 @@ router.route('/:id/actions')
         .get(function(req, res, next) {
             Issue.findById(req.params.id).populate('actions').exec(function(err, issue) {
                 if (issue === undefined) {
-                    res.status(404).json({error:{message:'resource not found'}}).end();
+                    res.status(404).json({error: {message: 'resource not found'}}).end();
                 }
                 else {
 
