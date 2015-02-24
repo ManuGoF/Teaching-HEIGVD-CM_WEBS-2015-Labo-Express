@@ -13,10 +13,10 @@ module.exports = function(app) {
 
 function convertMongoIssue(issue) {
     var staffmember = null;
-    console.log(issue.staffmember);
-    if (issue.sfaffmember !== undefined) {
+
+    if (issue.staffmember !== undefined) {
        staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']}
-    }
+    } 
     return {
         id: issue.id,
         author: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
@@ -36,6 +36,7 @@ function convertMongoIssue(issue) {
 }
 
 function convertMongoIssues(issue) {
+    
     return {
         id: issue.id,
         author: issue.author,
@@ -165,7 +166,7 @@ router.route('/:id')
                     issue.staffmember = req.body.staffmember;
 
                     issue.save(function(err, issueSaved) {
-                        Issue.findById(issueSaved.id).populate('issueType author staffmember').exec(function(err, issuePopulated) {
+                        Issue.findById(issueSaved.id).populate('issueType author staffmember comments').exec(function(err, issuePopulated) {
                             res.status(201).json(convertMongoIssue(issuePopulated));
                         });
                     });
