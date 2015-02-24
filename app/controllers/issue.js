@@ -15,8 +15,8 @@ function convertMongoIssue(issue) {
     var staffmember = null;
 
     if (issue.staffmember !== undefined) {
-       staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']}
-    } 
+        staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']}
+    }
     return {
         id: issue.id,
         author: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
@@ -36,7 +36,7 @@ function convertMongoIssue(issue) {
 }
 
 function convertMongoIssues(issue) {
-    
+
     return {
         id: issue.id,
         author: issue.author,
@@ -229,6 +229,7 @@ router.route('/:id/actions')
             } else if (action.type === 'addTag') {
                 Issue.findById(req.params.id).populate('issueType author staffmembe comments').exec(function(err, issue) {
                     issue['tags'].push(action.content['tag']);
+                    issue['actions'].push(action);
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
@@ -238,6 +239,7 @@ router.route('/:id/actions')
             } else if (action.type === 'updateStatus') {
                 Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                     issue.status = action.content['newStatus'];
+                    issue['actions'].push(action);
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
@@ -245,11 +247,14 @@ router.route('/:id/actions')
                     });
                 });
             } else if (action.type === 'updateStaffmember') {
-                Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
+                Issue.findById(req.params.id).exec(function(err, issue) {
                     issue.staffmember = action.content['newStaffmember'];
+                    issue['actions'].push(action);
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
-                            res.json(convertMongoIssue(issueSaved));
+                            Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
+                                res.json(convertMongoIssue(issue));
+                            });
                         });
                     });
                 });
