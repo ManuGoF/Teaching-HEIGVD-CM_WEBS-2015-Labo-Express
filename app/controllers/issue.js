@@ -204,7 +204,7 @@ router.route('/:id/actions')
                     content: action.content['comment']
                 });
                 comment.save(function(err, commentSaved) {
-                    Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
+                    Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                         issue['comments'].push(commentSaved);
                         issue['actions'].push(action);
                         issue.save(function(err, issueSaved) {
@@ -219,7 +219,7 @@ router.route('/:id/actions')
 
 
             } else if (action.type === 'addTag') {
-                Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
+                Issue.findById(req.params.id).populate('issueType author staffmembe comments').exec(function(err, issue) {
                     issue['tags'].push(action.content['tag']);
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
@@ -228,7 +228,7 @@ router.route('/:id/actions')
                     });
                 });
             } else if (action.type === 'updateStatus') {
-                Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
+                Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                     issue.status = action.content['newStatus'];
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
