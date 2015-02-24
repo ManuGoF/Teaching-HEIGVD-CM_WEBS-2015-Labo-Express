@@ -15,7 +15,7 @@ function convertMongoIssue(issue) {
     var staffmember = null;
 
     if (issue.staffmember !== undefined) {
-        staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']}
+        staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']};
     }
     return {
         id: issue.id,
@@ -27,7 +27,7 @@ function convertMongoIssue(issue) {
         status: issue.status,
         staffmember: staffmember,
         comments: _.map(issue.comments, function(comment) {
-            return {"id": comment.id, "author": comment.author, "comment": comment.content}
+            return {"id": comment.id, "author": comment.author, "comment": comment.content};
         }),
         tags: issue.tags,
         creatingDate: issue.creatingDate,
@@ -227,7 +227,7 @@ router.route('/:id/actions')
 
 
             } else if (action.type === 'addTag') {
-                Issue.findById(req.params.id).populate('issueType author staffmembe comments').exec(function(err, issue) {
+                Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                     issue['tags'].push(action.content['tag']);
                     issue['actions'].push(action);
                     issue.save(function(err, issueSaved) {
