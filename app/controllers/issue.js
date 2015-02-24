@@ -12,6 +12,11 @@ module.exports = function(app) {
 };
 
 function convertMongoIssue(issue) {
+    var staffmember = null;
+    console.log(issue.staffmember);
+    if (issue.sfaffmember !== undefined) {
+       staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']}
+    }
     return {
         id: issue.id,
         author: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
@@ -20,8 +25,10 @@ function convertMongoIssue(issue) {
         latitude: issue.latitude,
         longitude: issue.longitude,
         status: issue.status,
-        staffmember: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
-        comments: _.map(issue.comments, function(comment){return {"id":comment.id, "author": comment.author, "comment": comment.content}}),
+        staffmember: staffmember,
+        comments: _.map(issue.comments, function(comment) {
+            return {"id": comment.id, "author": comment.author, "comment": comment.content}
+        }),
         tags: issue.tags,
         creatingDate: issue.creatingDate,
         closingDate: issue.closingDate
@@ -41,7 +48,7 @@ function convertMongoIssues(issue) {
         creatingDate: issue.creatingDate,
         closingDate: issue.closingDate
     };
-    }
+}
 function convertMongoComment(comment) {
     return {
         id: comment.id,
@@ -95,14 +102,14 @@ router.route('/')
                 } else if (solved === 'false') {
                     query['$where'] = 'this.status != "solved"';
                 }
-                
+
             }
-            
+
             Issue.find()
                     .and(query)
                     //.sort([[by, order]])
                     .skip((pageNumber - 1) * paginate).limit(paginate)
-                    
+
                     .exec(function(err, issues) {
                         if (err)
                             return next(err);
@@ -119,8 +126,8 @@ router.route('/')
                 description: req.body.description,
                 latitude: req.body.latitude,
                 longitude: req.body.longitude,
-                status: req.body.status,
-                staffmember: req.body.staffmember
+                status: 'created'
+
             });
 
             issue.save(function(err, issueSaved) {
@@ -230,6 +237,15 @@ router.route('/:id/actions')
             } else if (action.type === 'updateStatus') {
                 Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                     issue.status = action.content['newStatus'];
+                    issue.save(function(err, issueSaved) {
+                        action.save(function(err, actionSaved) {
+                            res.json(convertMongoIssue(issueSaved));
+                        });
+                    });
+                });
+            } else if (action.type === 'updateStaffmember') {
+                Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
+                    issue.staffmember = action.content['newStaffmember'];
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
