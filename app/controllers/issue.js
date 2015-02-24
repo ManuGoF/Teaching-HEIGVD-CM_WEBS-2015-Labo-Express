@@ -60,10 +60,16 @@ function convertMongoComment(comment) {
 
 function convertMongoAction(action) {
     //return user.toObject({ transform: true })
+    var content;
+    if (action['type'] === 'addComment') {
+        content = {"author": action.content.author, "comment": action.content.content};
+    } else {
+        content = action.content;
+    }
     return {
         id: action.id,
         type: action.type,
-        content: action.content,
+        content: content,
         creatingDate: action.creatingDate
     };
 }
