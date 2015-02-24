@@ -21,11 +21,27 @@ function convertMongoIssue(issue) {
         longitude: issue.longitude,
         status: issue.status,
         staffmember: {"id": issue.author['id'], "firstname": issue.author['firstname'], "lastname": issue.author['lastname'], "phone": issue.author['phone'], "roles": issue.author['roles']},
+        comments: _.map(issue.comments, function(comment){return {"id":comment.id, "author": comment.author, "comment": comment.content}}),
+        tags: issue.tags,
         creatingDate: issue.creatingDate,
         closingDate: issue.closingDate
     };
 }
 
+function convertMongoIssues(issue) {
+    return {
+        id: issue.id,
+        author: issue.author,
+        issueType: issue.issueType,
+        description: issue.description,
+        latitude: issue.latitude,
+        longitude: issue.longitude,
+        status: issue.status,
+        staffmember: issue.staffmember,
+        creatingDate: issue.creatingDate,
+        closingDate: issue.closingDate
+    };
+    }
 function convertMongoComment(comment) {
     return {
         id: comment.id,
@@ -49,7 +65,6 @@ router.route('/')
             var paginate = req.query.ps;
             var pageNumber = req.query.p;
             var author = req.query.author;
-            var issueType = req.query.issueType;
             var issueType = req.query.issueType;
             var from = req.query.fromDate;
             var to = req.query.toDate;
@@ -87,12 +102,12 @@ router.route('/')
                     .and(query)
                     //.sort([[by, order]])
                     .skip((pageNumber - 1) * paginate).limit(paginate)
-                    .populate('issueType author staffmember')
+                    
                     .exec(function(err, issues) {
                         if (err)
                             return next(err);
                         res.json(_.map(issues, function(issue) {
-                            return convertMongoIssue(issue);
+                            return convertMongoIssues(issue);
                         }));
                     });
         })
@@ -118,7 +133,7 @@ router.route('/')
 
 router.route('/:id')
         .get(function(req, res, next) {
-            Issue.findById(req.params.id).populate('issueType author staffmember').exec(function(err, issue) {
+            Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                 if (issue === undefined) {
                     res.status(404).json({error: {message: 'resource not found'}}).end();
                 }
