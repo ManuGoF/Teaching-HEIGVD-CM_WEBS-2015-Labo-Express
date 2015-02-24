@@ -1,6 +1,6 @@
 Projet dans le cadre du cours Webservices par Emmanuel Bezençon et Cedric Liengme
 
-URL Heroku : https://cryptic-hollows-9214.herokuapp.com/api/v1
+URL Heroku : http://cryptic-hollows-9214.herokuapp.com/api/v1
 
 # Smart City - Citizen Engagement - Express Skeleton
 
