@@ -12,7 +12,7 @@ module.exports = function(app) {
 };
 
 function convertMongoIssue(issue) {
-    var staffmember = null;
+    var staffmember = undefined;
 
     if (issue.staffmember !== undefined) {
         staffmember = {"id": issue.staffmember['id'], "firstname": issue.staffmember['firstname'], "lastname": issue.staffmember['lastname'], "phone": issue.staffmember['phone'], "roles": issue.staffmember['roles']};
@@ -246,6 +246,11 @@ router.route('/:id/actions')
                 Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                     issue.status = action.content['newStatus'];
                     issue['actions'].push(action);
+                    if (action.content['newStatus'] === 'solved') {
+                        issue.closingDate = new Date();
+                    } else {
+                        issue.closingDate = undefined;
+                    }
                     issue.save(function(err, issueSaved) {
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
