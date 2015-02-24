@@ -65,21 +65,32 @@ router.route('/:id')
 
         // get the issuetype with that id (accessed at GET http://localhost:3000/api/issuetypes/:issuetype_id)
         .get(function(req, res, next) {
+
             IssueType.findById(req.params.id, function(err, issueType) {
-                res.json(convertMongoIssueType(issueType));
+                if (issueType === undefined) {
+                    res.status(404).json({error: {message: 'resource not found'}}).end();
+                } else {
+                    res.json(convertMongoIssueType(issueType));
+                }
+
             });
         })
 
         // update the issuetype with this id (accessed at PUT http://localhost:3000/api/issuetypes/:issuetype_id)
         .put(function(req, res, next) {
             IssueType.findById(req.params.id, function(err, issueType) {
-                issueType.shortname = req.body.shortname;
-                issueType.description = req.body.description;
+                if (issueType === undefined) {
+                    res.status(404).json({error: {message: 'resource not found'}}).end();
+                } else {
+                    issueType.shortname = req.body.shortname;
+                    issueType.description = req.body.description;
 
 
-                issueType.save(function(err, issueTypeSaved) {
-                    res.json(convertMongoIssueType(issueTypeSaved));
-                });
+                    issueType.save(function(err, issueTypeSaved) {
+                        res.json(convertMongoIssueType(issueTypeSaved));
+                    });
+                }
+
             });
         })
 

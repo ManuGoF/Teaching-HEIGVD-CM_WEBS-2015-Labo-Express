@@ -50,7 +50,7 @@ router.route('/')
 router.route('/:id')
         .get(function(req, res, next) {
             User.findById(req.params.id, function(err, user) {
-                if (user === null) {
+                if (user === undefined) {
                     res.status(204).end();
                 }
                 else {
@@ -64,7 +64,7 @@ router.route('/:id')
         .put(function(req, res, next) {
             User.findById(req.params.id, function(err, user) {
 
-                if (user === null) {
+                if (user === undefined) {
                     res.status(204).end();
                 }
                 else {
