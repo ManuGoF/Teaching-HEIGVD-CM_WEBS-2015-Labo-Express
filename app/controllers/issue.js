@@ -27,7 +27,7 @@ function convertMongoIssue(issue) {
         status: issue.status,
         staffmember: staffmember,
         comments: _.map(issue.comments, function(comment) {
-            return {"id": comment.id, "author": comment.author, "comment": comment.content};
+            return {"id": comment.id, "date": comment.date, "author": comment.author, "comment": comment.content};
         }),
         tags: issue.tags,
         creatingDate: issue.creatingDate,
