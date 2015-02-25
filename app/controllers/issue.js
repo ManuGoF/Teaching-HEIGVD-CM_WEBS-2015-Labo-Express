@@ -222,6 +222,7 @@ router.route('/:id/actions')
                         issue['comments'].push(commentSaved);
                         issue['actions'].push(action);
                         issue.save(function(err, issueSaved) {
+                            action.issue = issueSaved.id;
                             action.save(function(err, actionSaved) {
                                 res.json(convertMongoIssue(issueSaved));
                             });
@@ -237,6 +238,7 @@ router.route('/:id/actions')
                     issue['tags'].push(action.content['tag']);
                     issue['actions'].push(action);
                     issue.save(function(err, issueSaved) {
+                        action.issue = issueSaved.id;
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
                         });
@@ -252,6 +254,7 @@ router.route('/:id/actions')
                         issue.closingDate = undefined;
                     }
                     issue.save(function(err, issueSaved) {
+                        action.issue = issueSaved.id;
                         action.save(function(err, actionSaved) {
                             res.json(convertMongoIssue(issueSaved));
                         });
@@ -262,6 +265,7 @@ router.route('/:id/actions')
                     issue.staffmember = action.content['newStaffmember'];
                     issue['actions'].push(action);
                     issue.save(function(err, issueSaved) {
+                        action.issue = issueSaved.id;
                         action.save(function(err, actionSaved) {
                             Issue.findById(req.params.id).populate('issueType author staffmember comments').exec(function(err, issue) {
                                 res.json(convertMongoIssue(issue));

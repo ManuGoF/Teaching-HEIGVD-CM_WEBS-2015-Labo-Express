@@ -20,6 +20,7 @@ function convertMongoAction(action) {
     }
     return {
         id: action.id,
+        issue: action.issue,
         type: action.type,
         content: content,
         creatingDate: action.creatingDate
