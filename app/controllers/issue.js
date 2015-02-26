@@ -5,7 +5,8 @@ var
         mongoose = require('mongoose'),
         Issue = mongoose.model('Issue'),
         Action = mongoose.model('Action'),
-        Comment = mongoose.model('Comment');
+        Comment = mongoose.model('Comment'),
+        geolib = require('geolib');
 
 module.exports = function(app) {
     app.use('/api/v1/issues', router);
@@ -83,6 +84,9 @@ router.route('/')
             var from = req.query.fromDate;
             var to = req.query.toDate;
             var solved = req.query.solved;
+            var lat = req.query.lat;
+            var long = req.query.long;
+            var radius = req.query.radius;
             var query = {};
             if (author !== undefined) {
                 query['author'] = author;
@@ -116,13 +120,25 @@ router.route('/')
                     .and(query)
                     //.sort([[by, order]])
                     .skip((pageNumber - 1) * paginate).limit(paginate)
-
                     .exec(function(err, issues) {
                         if (err)
                             return next(err);
-                        res.json(_.map(issues, function(issue) {
-                            return convertMongoIssues(issue);
-                        }));
+
+                        if (lat !== undefined && long !== undefined && radius !== undefined) {
+                            var issuesInZone = [];
+                            _.map(issues, function(issue) {
+                                if (geolib.isPointInCircle({latitude: issue.latitude, longitude: issue.longitude}, {latitude: lat, longitude: long}, radius)) {
+                                    issuesInZone.push(issue);
+                                }
+                            });
+                            res.json(_.map(issuesInZone, function(issue) {
+                                return convertMongoIssues(issue);
+                            }));
+                        } else {
+                            res.json(_.map(issues, function(issue) {
+                                return convertMongoIssues(issue);
+                            }));
+                        }
                     });
         })
 
