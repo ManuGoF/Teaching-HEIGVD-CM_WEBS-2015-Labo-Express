@@ -63,7 +63,7 @@ function convertMongoAction(action) {
     //return user.toObject({ transform: true })
     var content;
     if (action['type'] === 'addComment') {
-        content = {"author": action.content.author, "comment": action.content.content};
+        content = {"author": action.content.author, "comment": action.content.comment};
     } else {
         content = action.content;
     }
