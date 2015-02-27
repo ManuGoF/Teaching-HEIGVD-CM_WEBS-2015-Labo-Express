@@ -34,7 +34,7 @@ router.route('/')
                 order = 'asc';
             }
             if (by !== 'id' && by !== 'firstname' && by !== 'lastname') {
-                by = 'shortname';
+                by = 'lastname';
             }
 
             User.find()
