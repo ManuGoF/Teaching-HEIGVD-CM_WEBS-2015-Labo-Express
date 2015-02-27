@@ -67,7 +67,7 @@ router.route('/:id')
         .get(function(req, res, next) {
             User.findById(req.params.id, function(err, user) {
                 if (user === undefined) {
-                    res.status(204).end();
+                    res.status(404).end();
                 }
                 else {
                     res.json(convertMongoUser(user));
@@ -81,7 +81,7 @@ router.route('/:id')
             User.findById(req.params.id, function(err, user) {
 
                 if (user === undefined) {
-                    res.status(204).end();
+                    res.status(404).end();
                 }
                 else {
                     user.firstname = req.body.firstname;
