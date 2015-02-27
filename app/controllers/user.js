@@ -25,13 +25,29 @@ function convertMongoUser(user) {
 
 router.route('/')
         .get(function(req, res, next) {
-            User.find(function(err, users) {
-                if (err)
-                    return next(err);
-                res.json(_.map(users, function(user) {
-                    return convertMongoUser(user);
-                }));
-            });
+            var paginate = req.query.ps;
+            var pageNumber = req.query.p;
+            var by = req.query.by;
+            var order = req.query.order;
+            var regex = new RegExp(req.query.search, 'i');
+            if (order !== 'asc' && order !== 'desc') {
+                order = 'asc';
+            }
+            if (by !== 'id' && by !== 'firstname' && by !== 'lastname') {
+                by = 'shortname';
+            }
+
+            User.find()
+                    .or([{'firstname': regex}, {'lastname': regex}, {'phone': regex}])
+                    .sort([[by, order]])
+                    .skip((pageNumber - 1) * paginate).limit(paginate)
+                    .exec(function(err, users) {
+                        if (err)
+                            return next(err);
+                        res.json(_.map(users, function(user) {
+                            return convertMongoUser(user);
+                        }));
+                    });
         })
 
         .post(function(req, res, next) {

@@ -24,6 +24,8 @@ router.route('/')
 
         // get all the issuetypes (accessed at GET http://localhost:3000/api/issuetypes)
         .get(function(req, res, next) {
+            var paginate = req.query.ps;
+            var pageNumber = req.query.p;
             var by = req.query.by;
             var order = req.query.order;
             var regex = new RegExp(req.query.search, 'i');
@@ -35,9 +37,9 @@ router.route('/')
             }
 
             IssueType.find()
-                    .or([{'shortname': regex}, {'description': regex}, {'id': regex}])
+                    .or([{'shortname': regex}, {'description': regex}])
                     .sort([[by, order]])
-                    //.skip().limit() -> to implement for pagination
+                    .skip((pageNumber - 1) * paginate).limit(paginate)
                     .exec(function(err, issueTypes) {
                         if (err)
                             return next(err);

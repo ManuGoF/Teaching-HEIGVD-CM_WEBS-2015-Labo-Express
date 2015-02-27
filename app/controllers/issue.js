@@ -118,7 +118,6 @@ router.route('/')
 
             Issue.find()
                     .and(query)
-                    //.sort([[by, order]])
                     .skip((pageNumber - 1) * paginate).limit(paginate)
                     .exec(function(err, issues) {
                         if (err)
